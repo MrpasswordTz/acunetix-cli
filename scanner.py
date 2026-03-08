@@ -1062,7 +1062,13 @@ def download_report(report_id, output_path=None):
     if not output_path:
         output_path = f"report_{report_id}.pdf"
 
-    response = api_request("GET", f"/reports/download/{links[0]}", stream=True)
+    link = links[0]
+    # Acunetix returns full API paths; strip /api/v1 prefix since BASE_URL includes it
+    if link.startswith("/api/v1"):
+        link = link[len("/api/v1"):]
+    elif not link.startswith("/"):
+        link = f"/reports/download/{link}"
+    response = api_request("GET", link, stream=True)
     if response is None:
         return
 
